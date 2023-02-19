@@ -21,19 +21,24 @@ class MessageController extends Controller
 
   public function receive(Request $request)
   {
-    $requestingPubID = $request->header('pub_id');
+    if ($request->hasHeader('X-Pub-Id')) {
+      $requestingPubID = $request->header('X-Pub-Id');
 
-    // Get all messages that belong to user
-    $allMessages = Message::where('recipient', $requestingPubID)->get();
+      // Get all messages that belong to user
+      $allMessages = Message::where('recipient', $requestingPubID)->get();
 
-    // Delete all messages that were queried
-    foreach ($allMessages as $key => $message) {
-      $message->delete();
+      // Delete all messages that were queried
+      foreach ($allMessages as $key => $message) {
+        $message->delete();
+      }
+
+      return response([
+        'messages' => $allMessages,
+      ], 200);
+    } else {
+      return response([
+        'messages' => "No 'X-Pub-Id' header found on request",
+      ], 500);
     }
-
-    return response([
-      'messages' => $allMessages,
-      'pubid' => $requestingPubID
-    ], 200);
   }
 }
