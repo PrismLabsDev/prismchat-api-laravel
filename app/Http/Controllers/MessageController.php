@@ -32,7 +32,8 @@ class MessageController extends Controller
     }
 
     return response([
-      'messages' => $allMessages
+      'messages' => $allMessages,
+      'pubid' => $requestingPubID
     ], 200);
   }
 }
