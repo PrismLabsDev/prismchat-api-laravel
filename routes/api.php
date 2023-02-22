@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MessageController;
+use App\Http\Controllers\api\v1\MessageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,13 +15,7 @@ use App\Http\Controllers\MessageController;
 |
 */
 
-Route::post('/test', function (Request $request) {
-  return response([
-    'message' => 'This is a test route!'
-  ], 200);
-});
-
-Route::prefix('/message')->middleware([])->group(function () {
-  Route::get('/', [MessageController::class, 'receive']);
-  Route::post('/', [MessageController::class, 'send']);
-});
+// Route::get('/', function () {
+//   return Redirect::to('https://prism.chat/');
+//   //return view('welcome');
+// });
