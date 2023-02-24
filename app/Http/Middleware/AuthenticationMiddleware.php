@@ -23,8 +23,8 @@ class AuthenticationMiddleware
 
       try {
         $jwt = $request->bearerToken();
-        $jwtPublicKey = sodium_bin2base64(sodium_crypto_sign_publickey(sodium_base642bin(config("auth.keypair_jwt"), SODIUM_BASE64_VARIANT_ORIGINAL)), SODIUM_BASE64_VARIANT_ORIGINAL);
-        $decoded = JWT::decode($jwt, new Key($jwtPublicKey, 'EdDSA'));
+        $jwtPublicKey = sodium_bin2base64(sodium_crypto_sign_publickey(sodium_base642bin(config("auth.keypair_jwt"), SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING)), SODIUM_BASE64_VARIANT_ORIGINAL);
+        $decoded = JWT::decode($jwt, new Key($jwtPublicKey, 'EdDSA')); // key is required in SODIUM_BASE64_VARIANT_ORIGINAL
         $decodedArray = json_decode(json_encode($decoded), true);
 
         $request['user_pubkey'] = $decodedArray['aud'];

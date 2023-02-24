@@ -52,11 +52,13 @@ class AuthController extends Controller
 
     try {
 
-      $authPublicKey = sodium_crypto_box_publickey(sodium_base642bin(config("auth.keypair_auth"), SODIUM_BASE64_VARIANT_ORIGINAL));
+      $authPublicKey = sodium_crypto_box_publickey(sodium_base642bin(config("auth.keypair_auth"), SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING));
+      $jwtPublicKey = sodium_crypto_sign_publickey(sodium_base642bin(config("auth.keypair_jwt"), SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING));
 
       return response([
         'message' => 'Server Public Key.',
-        'pubkey' => sodium_bin2base64($authPublicKey, SODIUM_BASE64_VARIANT_ORIGINAL),
+        'auth_pubkey' => sodium_bin2base64($authPublicKey, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING),
+        'jwt_pubkey' => sodium_bin2base64($jwtPublicKey, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING)
       ], 200);
     } catch (\exception $e) {
       Log::error($e);
@@ -87,8 +89,8 @@ class AuthController extends Controller
       $newAuthRequest->save();
 
       // Get authentication key
-      $authKeys = sodium_base642bin(config("auth.keypair_auth"), SODIUM_BASE64_VARIANT_ORIGINAL);
-      $authPublicKey = sodium_bin2base64(sodium_crypto_box_publickey($authKeys), SODIUM_BASE64_VARIANT_ORIGINAL);
+      $authKeys = sodium_base642bin(config("auth.keypair_auth"), SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
+      $authPublicKey = sodium_bin2base64(sodium_crypto_box_publickey($authKeys), SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
 
       return response([
         'message' => 'Requesting Authentication.',
@@ -116,19 +118,21 @@ class AuthController extends Controller
       // Validate auth request
       $verificationRequest = AuthRequest::where('public_key', $request->pubkey)->first();
 
-      $authKeys = sodium_base642bin(config("auth.keypair_auth"), SODIUM_BASE64_VARIANT_ORIGINAL);
+      $authKeys = sodium_base642bin(config("auth.keypair_auth"), SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
       $authPrivateKey = sodium_crypto_box_secretkey($authKeys);
 
-      $cypher = sodium_base642bin($request->cypher, SODIUM_BASE64_VARIANT_ORIGINAL);
-      $nonce = sodium_base642bin($request->nonce, SODIUM_BASE64_VARIANT_ORIGINAL);
+      Log::info($authPrivateKey);
 
-      $boxKeyPair = sodium_crypto_box_keypair_from_secretkey_and_publickey($authPrivateKey, sodium_base642bin($verificationRequest->public_key, SODIUM_BASE64_VARIANT_ORIGINAL));
+      $cypher = sodium_base642bin($request->cypher, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
+      $nonce = sodium_base642bin($request->nonce, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
+
+      $boxKeyPair = sodium_crypto_box_keypair_from_secretkey_and_publickey($authPrivateKey, sodium_base642bin($verificationRequest->public_key, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING));
 
       $decryptedCypher = json_decode(sodium_crypto_box_open($cypher, $nonce, $boxKeyPair), true);
 
       if ($decryptedCypher['verificationString'] == $verificationRequest->verification_string) {
         // Generate JWT
-        $jwtPrivateKey = sodium_bin2base64(sodium_crypto_sign_secretkey(sodium_base642bin(config("auth.keypair_jwt"), SODIUM_BASE64_VARIANT_ORIGINAL)), SODIUM_BASE64_VARIANT_ORIGINAL);
+        $jwtPrivateKey = sodium_bin2base64(sodium_crypto_sign_secretkey(sodium_base642bin(config("auth.keypair_jwt"), SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING)), SODIUM_BASE64_VARIANT_ORIGINAL);
 
         $issuedAt = floor(microtime(true));
         $expireAt = floor($issuedAt + (1 * 60 * 60 * 24)); // millisecond, second, minute, hour, day
@@ -140,7 +144,7 @@ class AuthController extends Controller
           'exp' => $expireAt,
         ];
 
-        $jwt = JWT::encode($payload, $jwtPrivateKey, 'EdDSA');
+        $jwt = JWT::encode($payload, $jwtPrivateKey, 'EdDSA'); // key is required in SODIUM_BASE64_VARIANT_ORIGINAL
 
         return response([
           'message' => 'Authentication Verified.',

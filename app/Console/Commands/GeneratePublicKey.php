@@ -27,8 +27,8 @@ class GeneratePublicKey extends Command
   {
     $keyPair = sodium_crypto_box_keypair();
 
-    echo ("COMBINED: " . sodium_bin2base64($keyPair, SODIUM_BASE64_VARIANT_ORIGINAL) . "\n");
-    echo ("PUBLIC: " . sodium_bin2base64(sodium_crypto_box_publickey($keyPair), SODIUM_BASE64_VARIANT_ORIGINAL) . "\n");
-    echo ("PRIVATE: " . sodium_bin2base64(sodium_crypto_box_secretkey($keyPair), SODIUM_BASE64_VARIANT_ORIGINAL) . "\n");
+    echo ("COMBINED: " . sodium_bin2base64($keyPair, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING) . "\n");
+    echo ("PUBLIC: " . sodium_bin2base64(sodium_crypto_box_publickey($keyPair), SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING) . "\n");
+    echo ("PRIVATE: " . sodium_bin2base64(sodium_crypto_box_secretkey($keyPair), SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING) . "\n");
   }
 }
