@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api\v1;
 
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Message;
@@ -11,20 +12,32 @@ class MessageController extends Controller
 {
   public function send(Request $request)
   {
-    $newMessage = new Message;
-    $newMessage->recipient = $request->to;
-    $newMessage->message = $request->data;
-    $newMessage->save();
+    $request->validate([
+      'to' => ['required'],
+      'data' => ['required'],
+    ]);
 
-    return response([
-      'message' => 'Message sent.'
-    ], 200);
+    try {
+      $newMessage = new Message;
+      $newMessage->recipient = $request->to;
+      $newMessage->message = $request->data;
+      $newMessage->save();
+
+      return response([
+        'message' => 'Message sent.'
+      ], 200);
+    } catch (\exception $e) {
+      Log::error($e);
+      return response([
+        'message' => 'Error.',
+      ], 500);
+    }
   }
 
   public function receive(Request $request)
   {
-    if ($request->hasHeader('X-Pub-Id')) {
-      $requestingPubID = $request->header('X-Pub-Id');
+    try {
+      $requestingPubID = $request['user_pubkey']; // user_pubkey
 
       // Get all messages that belong to user
       $allMessages = Message::where('recipient', $requestingPubID)->get();
@@ -36,10 +49,12 @@ class MessageController extends Controller
 
       return response([
         'messages' => $allMessages,
+        'pid' => $requestingPubID
       ], 200);
-    } else {
+    } catch (\exception $e) {
+      Log::error($e);
       return response([
-        'messages' => "No 'X-Pub-Id' header found on request",
+        'message' => 'Error.',
       ], 500);
     }
   }

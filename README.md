@@ -19,6 +19,13 @@ cp .env.example .env
 php artisan key:generate --show
 ```
 
+## Generate necessary keys
+
+``` bash
+  ./vendor/bin/sail artisan key:jwt # Copy COMBINED key to KEYPAIR_JWT in .env
+  ./vendor/bin/sail artisan key:auth # Copy COMBINED key to KEYPAIR_AUTH in .env
+```
+
 ### Install dependencies
 
 ``` bash

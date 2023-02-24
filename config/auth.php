@@ -2,7 +2,7 @@
 
 return [
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
     |--------------------------------------------------------------------------
@@ -13,12 +13,12 @@ return [
     |
     */
 
-    'defaults' => [
-        'guard' => 'web',
-        'passwords' => 'users',
-    ],
+  'defaults' => [
+    'guard' => 'web',
+    'passwords' => 'users',
+  ],
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Authentication Guards
     |--------------------------------------------------------------------------
@@ -35,14 +35,14 @@ return [
     |
     */
 
-    'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
+  'guards' => [
+    'web' => [
+      'driver' => 'session',
+      'provider' => 'users',
     ],
+  ],
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | User Providers
     |--------------------------------------------------------------------------
@@ -59,19 +59,19 @@ return [
     |
     */
 
-    'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\User::class,
-        ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+  'providers' => [
+    'users' => [
+      'driver' => 'eloquent',
+      'model' => App\Models\User::class,
     ],
 
-    /*
+    // 'users' => [
+    //     'driver' => 'database',
+    //     'table' => 'users',
+    // ],
+  ],
+
+  /*
     |--------------------------------------------------------------------------
     | Resetting Passwords
     |--------------------------------------------------------------------------
@@ -90,16 +90,16 @@ return [
     |
     */
 
-    'passwords' => [
-        'users' => [
-            'provider' => 'users',
-            'table' => 'password_reset_tokens',
-            'expire' => 60,
-            'throttle' => 60,
-        ],
+  'passwords' => [
+    'users' => [
+      'provider' => 'users',
+      'table' => 'password_reset_tokens',
+      'expire' => 60,
+      'throttle' => 60,
     ],
+  ],
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Password Confirmation Timeout
     |--------------------------------------------------------------------------
@@ -110,6 +110,32 @@ return [
     |
     */
 
-    'password_timeout' => 10800,
+  'password_timeout' => 10800,
+
+  /*
+    |--------------------------------------------------------------------------
+    | KeyPair used to generate JWT
+    |--------------------------------------------------------------------------
+    |
+    | Here is where you can access the keys used by our JWT.
+    |
+    */
+
+  'keypair_jwt' => env("KEYPAIR_JWT", false),
+
+  /*
+    |--------------------------------------------------------------------------
+    | KeyPair used to verify auth response
+    |--------------------------------------------------------------------------
+    |
+    | Prism does not store passwords, instead a user will request a temporary 
+    | secret which they will encrypt with a secret box and return to the server. 
+    | If the key in the secret box matches the record in the DB the user will 
+    | be issues a JWT with separate keys. This key pair is uses purely to verify 
+    | the temporary token.
+    |
+    */
+
+  'keypair_auth' => env("KEYPAIR_AUTH", false),
 
 ];
