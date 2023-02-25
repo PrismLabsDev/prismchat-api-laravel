@@ -146,6 +146,9 @@ class AuthController extends Controller
 
         $jwt = JWT::encode($payload, $jwtPrivateKey, 'EdDSA'); // key is required in SODIUM_BASE64_VARIANT_ORIGINAL
 
+        // Remove existing requests
+        AuthRequest::where('public_key', $request->pubkey)->delete();
+
         return response([
           'message' => 'Authentication Verified.',
           'access_token' => $jwt
