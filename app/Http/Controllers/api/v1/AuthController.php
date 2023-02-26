@@ -121,8 +121,6 @@ class AuthController extends Controller
       $authKeys = sodium_base642bin(config("auth.keypair_auth"), SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
       $authPrivateKey = sodium_crypto_box_secretkey($authKeys);
 
-      Log::info($authPrivateKey);
-
       $cypher = sodium_base642bin($request->cypher, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
       $nonce = sodium_base642bin($request->nonce, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
 
