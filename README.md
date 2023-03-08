@@ -12,31 +12,32 @@ The following describes how to setup and run the application dev environment.
 git clone git@github.com:jwoodrow99/prismchat-server-laravel.git
 ```
 
-### Copy example.env and fill in missing values
+### Run Development Docker
+
+``` bash
+docker-compose -f docker-compose.dev.yml up -d --build
+docker-compose -f docker-compose.dev.yml down
+```
+
+### Copy example.env
 
 ``` bash
 cp .env.example .env
-php artisan key:generate --show
 ```
 
-## Generate necessary keys
+## Generate Keys
 
 ``` bash
-  ./vendor/bin/sail artisan key:jwt # Copy COMBINED key to KEYPAIR_JWT in .env
-  ./vendor/bin/sail artisan key:auth # Copy COMBINED key to KEYPAIR_AUTH in .env
+docker exec prism-php php artisan key:generate --show # Copy key to APP_KEY in .env
+docker exec prism-php php artisan key:jwt # Copy COMBINED key to KEYPAIR_JWT in .env
+docker exec prism-php php artisan key:auth # Copy COMBINED key to KEYPAIR_AUTH in .env
 ```
 
-### Install dependencies
+### Install dependencies and run migrations
 
 ``` bash
-composer install
-```
-
-### Run laravel sail
-
-``` bash
-./vendor/bin/sail up -d
-./vendor/bin/sail artisan migrate:fresh --seed
+docker exec prism-php composer install
+docker exec prism-php php artisan migrate:fresh --seed
 ```
 
 ## Connections
