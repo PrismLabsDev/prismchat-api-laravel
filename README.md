@@ -1,6 +1,6 @@
 # Prism Chat Server Laravel
 
-This repository contains the Prism Chat Server application written in Laravel. We plan to have the first version avaliable written in Laravel and eventually create the application using GO.
+This repository contains the Prism Chat Server application written in Laravel. We plan to have the first version available written in Laravel and eventually create the application using GO.
 
 ## Setup Dev Environment
 
@@ -16,7 +16,13 @@ git clone git@github.com:jwoodrow99/prismchat-server-laravel.git
 
 ``` bash
 docker-compose -f docker-compose.dev.yml up -d --build
+# docker-compose -f docker-compose.dev.yml up -d --scale prism-php=2 --no-recreate
+# docker-compose -f docker-compose.dev.yml up -d --scale prism-php=1 --no-recreate
 docker-compose -f docker-compose.dev.yml down
+
+# Clear all docker data
+docker system prune -a
+docker volume prune
 ```
 
 ### Copy example.env
@@ -42,14 +48,4 @@ docker exec prism-php php artisan migrate:fresh --seed
 
 ## Connections
 
-You can access the running application on port 80 of your local system, this can be done by simply going to [http://localhost/](http://localhost/)
-
-The connection details for the docker environment is taken from the project .env file. Meaning whatever connections you set in your .env file will automatically be used in your docker container. By default to connect to the pgsql container you can access it at the following:
-
-| key | Value |
-|--|:--:|
-| Host | localhost |
-| Port | 5432 |
-| Username | sail |
-| Password | password |
-| Database | laravel |
+You can access the running application on port 80 of your local system, this can be done by simply going to [http://localhost:8080/](http://localhost:8080/)

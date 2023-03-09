@@ -2,45 +2,46 @@ version: '3.8'
 
 services:
 
-  nginx:
+  prism-nginx:
     build:
       context: ./docker
       dockerfile: nginx.dockerfile
-    container_name: 'prism-nginx'
     ports:
       - 8080:80
     volumes:
       - ./:/var/www
       - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
     depends_on:
-      - php
-      - node
-      - pgsql
-      - mailhog
+      - prism-php
+      - prism-node
+      - prism-redis
+      - prism-memcached
+      - prism-pgsql
+      - prism-mailhog
+    restart: "always"
 
-  php:
+  prism-php:
     build:
       context: ./docker
       dockerfile: php.dockerfile
-    container_name: 'prism-php'
     expose:
       - 9000
     volumes:
       - ./:/var/www
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     working_dir: /var/www
+    restart: "always"
 
-  node:
+  prism-node:
     build:
       context: ./docker
       dockerfile: node.dockerfile
-    container_name: 'prism-node'
+    restart: "always"
 
-  redis:
+  prism-redis:
     build:
       context: ./docker
       dockerfile: redis.dockerfile
-    container_name: 'prism-redis'
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
@@ -48,20 +49,21 @@ services:
     volumes:
       - ./docker/volumes/redis:/var/lib/redis
       - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    restart: "always"
 
-  memcached:
+  prism-memcached:
     build:
       context: ./docker
       dockerfile: memcached.dockerfile
-    container_name: 'prism-memcached'
+    restart: "always"
 
-  pgsql:
+  prism-pgsql:
     build:
       context: ./docker
       dockerfile: pgsql.dockerfile
-    container_name: 'prism-pgsql'
     ports:
       - '5432:5432'
+    restart: "always"
     environment:
       PGPASSWORD: 'secret'
       POSTGRES_DB: 'prism'
@@ -70,11 +72,11 @@ services:
     volumes:
       - './docker/volumes/pgsql:/var/lib/postgresql/data'
 
-  mailhog:
+  prism-mailhog:
     build:
       context: ./docker
       dockerfile: mailhog.dockerfile
-    container_name: 'prism-mailhog'
     ports:
       - "1025:1025"
       - "8025:8025"
+    restart: "always"
